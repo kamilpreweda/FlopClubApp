@@ -23,9 +23,16 @@ namespace FlopClub.Controllers
 
         [Authorize]
         [HttpPost("Join")]
-        public async Task<ActionResult> JoinGame(GetGameDto game)
+        public async Task<ActionResult> JoinGameLobby(JoinGameDto game)
         {
-            return Ok(await _gameService.JoinGame(game.Name, game.Password));
+            return Ok(await _gameService.JoinGameLobby(game));
+        }
+
+        [Authorize]
+        [HttpDelete]
+        public async Task<ActionResult> DeleteGame(DeleteGameDto game)
+        {
+            return Ok(await _gameService.DeleteGame(game));
         }
     }
 }

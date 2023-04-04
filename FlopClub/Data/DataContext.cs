@@ -13,5 +13,15 @@
         public DbSet<Player> Players => Set<Player>();
 
         public DbSet<Game> Games => Set<Game>();
+
+        public DbSet<Lobby> Lobbies => Set<Lobby>();
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Game>()
+                .HasOne(g => g.Lobby)
+                .WithOne(l => l.Game)
+                .HasForeignKey<Lobby>(l => l.Id);
+        }
     }
 }

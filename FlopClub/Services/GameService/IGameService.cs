@@ -4,6 +4,7 @@
     {
         Task<ServiceResponse<GetGameDto>> CreateGame(CreateGameDto newGame);
         Task<bool> GameExists(string gameName);
-        Task<ServiceResponse<GetGameDto>> JoinGame(string gameName, string password);
+        Task<ServiceResponse<GetGameDto>> JoinGameLobby(JoinGameDto game);
+        Task<ServiceResponse<GetGameDto>> DeleteGame(DeleteGameDto game);
     }
 }
