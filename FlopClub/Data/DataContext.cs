@@ -2,10 +2,10 @@
 {
     public class DataContext : DbContext
     {
-        public DataContext(DbContextOptions<DataContext> options) : base(options) 
+        public DataContext(DbContextOptions<DataContext> options) : base(options)
         {
         }
-        
+
         public DbSet<User> Users => Set<User>();
 
         public DbSet<Card> Cards => Set<Card>();
@@ -18,10 +18,11 @@
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Game>()
-                .HasOne(g => g.Lobby)
-                .WithOne(l => l.Game)
-                .HasForeignKey<Lobby>(l => l.Id);
+            modelBuilder.Entity<Lobby>()
+                .HasOne(l => l.Game)
+                .WithOne(g => g.Lobby)
+                .HasForeignKey<Game>(g => g.Id)
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

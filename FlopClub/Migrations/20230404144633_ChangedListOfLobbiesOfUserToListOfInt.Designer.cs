@@ -4,6 +4,7 @@ using FlopClub.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FlopClub.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20230404144633_ChangedListOfLobbiesOfUserToListOfInt")]
+    partial class ChangedListOfLobbiesOfUserToListOfInt
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -53,7 +56,7 @@ namespace FlopClub.Migrations
 
                     b.HasIndex("PlayerId");
 
-                    b.ToTable("Cards", (string)null);
+                    b.ToTable("Cards");
                 });
 
             modelBuilder.Entity("FlopClub.Models.Game", b =>
@@ -96,7 +99,7 @@ namespace FlopClub.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Games", (string)null);
+                    b.ToTable("Games");
                 });
 
             modelBuilder.Entity("FlopClub.Models.Lobby", b =>
@@ -106,7 +109,7 @@ namespace FlopClub.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Lobbies", (string)null);
+                    b.ToTable("Lobbies");
                 });
 
             modelBuilder.Entity("FlopClub.Models.Player", b =>
@@ -141,7 +144,7 @@ namespace FlopClub.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Players", (string)null);
+                    b.ToTable("Players");
                 });
 
             modelBuilder.Entity("FlopClub.Models.User", b =>
@@ -177,7 +180,7 @@ namespace FlopClub.Migrations
 
                     b.HasIndex("LobbyId");
 
-                    b.ToTable("Users", (string)null);
+                    b.ToTable("Users");
                 });
 
             modelBuilder.Entity("FlopClub.Models.Card", b =>

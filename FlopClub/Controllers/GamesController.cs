@@ -34,5 +34,12 @@ namespace FlopClub.Controllers
         {
             return Ok(await _gameService.DeleteGame(game));
         }
+
+        [AllowAnonymous]
+        [HttpGet]
+        public async Task<ActionResult> GetAllGames()
+        {
+            return Ok(await _gameService.GetAllGames());
+        }
     }
 }

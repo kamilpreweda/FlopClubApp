@@ -10,6 +10,11 @@ namespace FlopClub
         {
             CreateMap<CreateGameDto, Game>();
             CreateMap<Game, GetGameDto>();
+
+            CreateMap<User, GetUserDto>();
+            CreateMap<GetUserDto, User>();
+
+
             //CreateMap<Player, GetPlayerDto>();
             //CreateMap<AddPlayerDto, Player>();
         }
