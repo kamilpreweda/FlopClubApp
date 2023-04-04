@@ -15,10 +15,17 @@ namespace FlopClub.Controllers
         }
 
         [Authorize]
-        [HttpPost]
+        [HttpPost("Create")]
         public async Task<ActionResult> CreateGame(CreateGameDto newGame)
         {
             return Ok(await _gameService.CreateGame(newGame));
+        }
+
+        [Authorize]
+        [HttpPost("Join")]
+        public async Task<ActionResult> JoinGame(GetGameDto game)
+        {
+            return Ok(await _gameService.JoinGame(game.Name, game.Password));
         }
     }
 }
