@@ -5,6 +5,7 @@ namespace FlopClub.Models
     {
         public int Id { get; set; }
         public int UserId { get; set; }
+        public int GameId { get; set; }
         public decimal Chips { get; set; }
         public List<Card> Cards { get; set; } = new List<Card>();
         public HandStrength Hand { get; set; }

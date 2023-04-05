@@ -1,5 +1,4 @@
-﻿using FlopClub.Dtos.User;
-using Microsoft.AspNetCore.Http;
+﻿
 using Microsoft.AspNetCore.Mvc;
 
 namespace FlopClub.Controllers

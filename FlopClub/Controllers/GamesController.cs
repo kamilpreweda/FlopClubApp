@@ -41,5 +41,19 @@ namespace FlopClub.Controllers
         {
             return Ok(await _gameService.GetAllGames());
         }
+
+        [Authorize]
+        [HttpPost("BuyIn")]
+        public async Task<ActionResult> BuyIn(int gameId)
+        {
+            return Ok(await _gameService.BuyIn(gameId));
+        }
+
+        [Authorize]
+        [HttpPost("LeaveTable")]
+        public async Task<ActionResult> LeaveTable(int gameId)
+        {
+            return Ok(await _gameService.LeaveTable(gameId));
+        }
     }
 }

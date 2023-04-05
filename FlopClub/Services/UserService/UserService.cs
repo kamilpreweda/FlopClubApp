@@ -1,4 +1,4 @@
-﻿using FlopClub.Models;
+﻿
 
 namespace FlopClub.Services.UserService
 {
@@ -6,7 +6,6 @@ namespace FlopClub.Services.UserService
     {
         private readonly DataContext _context;
         private readonly IMapper _mapper;
-
         public UserService(DataContext context, IMapper mapper)
         {
             _context = context;
@@ -35,7 +34,7 @@ namespace FlopClub.Services.UserService
         {
             var response = new ServiceResponse<GetUserDto>();
             var user = await _context.Users
-                .Include(u => u.Lobbies)                
+                .Include(u => u.Lobbies)
                 .FirstOrDefaultAsync(u => u.Id == id);
             response.Data = _mapper.Map<GetUserDto>(user);
             return response;

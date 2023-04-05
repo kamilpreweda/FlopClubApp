@@ -8,6 +8,7 @@ global using FlopClub.Dtos.User;
 global using FlopClub.Services.Encrypter;
 global using FlopClub.Services.GameService;
 global using Microsoft.AspNetCore.Authorization;
+global using FlopClub.Repositories.Auth;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;

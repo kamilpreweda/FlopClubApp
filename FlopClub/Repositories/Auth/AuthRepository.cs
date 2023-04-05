@@ -1,9 +1,8 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using FlopClub.Services.Encrypter;
 using Microsoft.IdentityModel.Tokens;
 
-namespace FlopClub.Data
+namespace FlopClub.Repositories.Auth
 {
     public class AuthRepository : IAuthRepository
     {
@@ -66,7 +65,7 @@ namespace FlopClub.Data
                 return true;
             }
             return false;
-        }       
+        }
 
         private string CreateToken(User user)
         {

@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.ValueContentAnalysis;
+using Microsoft.EntityFrameworkCore;
 
 namespace FlopClub.Services.GameService
 {
@@ -160,7 +161,7 @@ namespace FlopClub.Services.GameService
 
             foreach (var user in gameToDelete.Lobby.Users)
             {
-                if (user.Lobbies.Contains(gameToDelete.Lobby));
+                if (user.Lobbies.Contains(gameToDelete.Lobby))
                 {
                     user.Lobbies.Remove(gameToDelete.Lobby);
                 }
@@ -181,6 +182,7 @@ namespace FlopClub.Services.GameService
             var games = await _context.Games
                 .Select(g => new GetGameDto
                 {
+                    Id = g.Id,
                     Name = g.Name,
                     MaxPlayers = g.MaxPlayers,
                     ActivePlayers = g.ActivePlayers,
@@ -189,6 +191,67 @@ namespace FlopClub.Services.GameService
                 .ToListAsync();
 
             response.Data = _mapper.Map<List<GetGameDto>>(games);
+            return response;
+        }
+
+        public async Task<ServiceResponse<GetGameDto>> BuyIn(int gameId)
+        {
+            var response = new ServiceResponse<GetGameDto>();
+            var user = GetCurrentUser();
+            var game = await _context.Games.FirstOrDefaultAsync(g => g.Id == gameId);
+
+            if (game == null)
+            {
+                response.Success= false;
+                response.Message = "Game not found";
+                return response;
+            }
+
+            if(game!.Players.Any(p => p.UserId == user.Id))
+            {
+                response.Success = false;
+                response.Message = "User is already a player in the game.";
+                return response;
+            }
+
+            if(game.ActivePlayers >= game.MaxPlayers)
+            {
+                response.Success = false;
+                response.Message = "Game is full.";
+                return response;
+            }
+
+            var player = new Player
+            {
+                UserId = user.Id,
+                GameId = game.Id,
+                Chips = 1000
+            };
+
+            game.Players.Add(player);
+            game.ActivePlayers++;
+            await _context.SaveChangesAsync();
+
+            response.Success = true;
+            response.Message = "Player was added to the game.";
+            response.Data = _mapper.Map<GetGameDto>(game);
+            return response;
+        }
+
+        public async Task<ServiceResponse<GetGameDto>> LeaveTable(int gameId)
+        {
+            var response = new ServiceResponse<GetGameDto>();
+            var user = GetCurrentUser();
+            var game = await _context.Games.FirstOrDefaultAsync(g => g.Id == gameId);
+            var player = game!.Players.FirstOrDefault(p => p.UserId == user.Id);
+
+            game.Players.Remove(player);
+            game.ActivePlayers--;
+            await _context.SaveChangesAsync();
+
+            response.Success = true;
+            response.Message = "Player was removed from the table";
+            response.Data = _mapper.Map<GetGameDto>(game);
             return response;
         }
     }
