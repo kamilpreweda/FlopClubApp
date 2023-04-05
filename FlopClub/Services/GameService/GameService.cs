@@ -20,7 +20,9 @@ namespace FlopClub.Services.GameService
         private User GetCurrentUser()
         {
             var username = _httpContextAccessor.HttpContext!.User!.Identity!.Name;
-            var user = _context.Users.FirstOrDefault(u => u.Username == username);     
+            var user = _context.Users
+                .Include(u => u.Lobbies)
+                .FirstOrDefault(u => u.Username == username);     
 
             return user!;
         }
@@ -72,7 +74,7 @@ namespace FlopClub.Services.GameService
 
             var gameToJoin = await _context.Games
                 .Include(g => g.Lobby)
-                .ThenInclude(g => g.Users)
+                .ThenInclude(l => l.Users)
                 .FirstOrDefaultAsync(g => g.Name == game.Name);
 
             if (gameToJoin == null)
@@ -126,6 +128,7 @@ namespace FlopClub.Services.GameService
             //};
 
             gameToJoin.Lobby.Users.Add(user);
+
             user.Lobbies.Add(gameToJoin.Lobby);
 
             await _context.SaveChangesAsync();
@@ -155,9 +158,9 @@ namespace FlopClub.Services.GameService
                 return response;
             }
 
-            foreach(var user in gameToDelete.Lobby.Users)
+            foreach (var user in gameToDelete.Lobby.Users)
             {
-                if(user.Lobbies.Contains(gameToDelete.Lobby))
+                if (user.Lobbies.Contains(gameToDelete.Lobby));
                 {
                     user.Lobbies.Remove(gameToDelete.Lobby);
                 }
@@ -176,7 +179,13 @@ namespace FlopClub.Services.GameService
         {
             var response = new ServiceResponse<List<GetGameDto>>();
             var games = await _context.Games
-                .Include(g => g.Lobby.Users)
+                .Select(g => new GetGameDto
+                {
+                    Name = g.Name,
+                    MaxPlayers = g.MaxPlayers,
+                    ActivePlayers = g.ActivePlayers,
+                    LobbyId = g.Lobby.Id
+                })
                 .ToListAsync();
 
             response.Data = _mapper.Map<List<GetGameDto>>(games);

@@ -30,5 +30,25 @@ namespace FlopClub.Services.UserService
             response.Data = _mapper.Map<GetUserDto>(userToDelete);
             return response;
         }
+
+        public async Task<ServiceResponse<GetUserDto>> Get(int id)
+        {
+            var response = new ServiceResponse<GetUserDto>();
+            var user = await _context.Users
+                .Include(u => u.Lobbies)                
+                .FirstOrDefaultAsync(u => u.Id == id);
+            response.Data = _mapper.Map<GetUserDto>(user);
+            return response;
+        }
+
+        public async Task<ServiceResponse<List<GetUserDto>>> GetAll()
+        {
+            var response = new ServiceResponse<List<GetUserDto>>();
+            var users = await _context.Users
+                .Include(u => u.Lobbies)
+                .ToListAsync();
+            response.Data = users.Select(u => _mapper.Map<GetUserDto>(u)).ToList();
+            return response;
+        }
     }
 }

@@ -73,6 +73,9 @@ namespace FlopClub.Migrations
                     b.Property<int>("Dealer")
                         .HasColumnType("int");
 
+                    b.Property<int>("GameId")
+                        .HasColumnType("int");
+
                     b.Property<int>("MaxPlayers")
                         .HasColumnType("int");
 
@@ -102,9 +105,18 @@ namespace FlopClub.Migrations
             modelBuilder.Entity("FlopClub.Models.Lobby", b =>
                 {
                     b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("GameId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("GameId")
+                        .IsUnique();
 
                     b.ToTable("Lobbies");
                 });
@@ -205,13 +217,11 @@ namespace FlopClub.Migrations
 
             modelBuilder.Entity("FlopClub.Models.Lobby", b =>
                 {
-                    b.HasOne("FlopClub.Models.Game", "Game")
+                    b.HasOne("FlopClub.Models.Game", null)
                         .WithOne("Lobby")
-                        .HasForeignKey("FlopClub.Models.Lobby", "Id")
+                        .HasForeignKey("FlopClub.Models.Lobby", "GameId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("Game");
                 });
 
             modelBuilder.Entity("FlopClub.Models.Player", b =>

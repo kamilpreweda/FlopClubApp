@@ -24,7 +24,8 @@ namespace FlopClub.Migrations
                     BigBlindValue = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     Dealer = table.Column<int>(type: "int", nullable: false),
                     MaxPlayers = table.Column<int>(type: "int", nullable: false),
-                    ActivePlayers = table.Column<int>(type: "int", nullable: false)
+                    ActivePlayers = table.Column<int>(type: "int", nullable: false),
+                    GameId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -53,13 +54,15 @@ namespace FlopClub.Migrations
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    GameId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Lobbies", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Lobbies_Games_Id",
-                        column: x => x.Id,
+                        name: "FK_Lobbies_Games_GameId",
+                        column: x => x.GameId,
                         principalTable: "Games",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -158,6 +161,12 @@ namespace FlopClub.Migrations
                 name: "IX_Cards_PlayerId",
                 table: "Cards",
                 column: "PlayerId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Lobbies_GameId",
+                table: "Lobbies",
+                column: "GameId",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_LobbyUser_UsersId",

@@ -18,16 +18,10 @@
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Lobby>()
-                .HasOne(l => l.Game)
-                .WithOne(g => g.Lobby)
-                .HasForeignKey<Game>(g => g.Id)
-                .OnDelete(DeleteBehavior.Cascade);
-
             modelBuilder.Entity<Game>()
                 .HasOne(g => g.Lobby)
-                .WithOne(l => l.Game)
-                .HasForeignKey<Lobby>(l => l.Id)
+                .WithOne()
+                .HasForeignKey<Lobby>(l => l.GameId)
                 .OnDelete(DeleteBehavior.Cascade);
         }
     }

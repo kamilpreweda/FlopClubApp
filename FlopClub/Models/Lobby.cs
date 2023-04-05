@@ -5,6 +5,6 @@ namespace FlopClub.Models
     {
         public int Id { get; set; }
         public List<User> Users { get; set; } = new List<User>();
-        public Game? Game { get; set; }
+        public int GameId { get; set; }
     }
 }

@@ -20,5 +20,18 @@ namespace FlopClub.Controllers
         {
             return Ok(await _userService.Delete(id));
         }
+
+        [HttpGet("GetAll")]
+        public async Task<ActionResult> GetAll()
+        {
+            return Ok(await _userService.GetAll());
+        }
+
+        [HttpGet("{id}")]
+        public async Task<ActionResult> Get(int id)
+        {
+            return Ok(await _userService.Get(id));
+        }
+
     }
 }
