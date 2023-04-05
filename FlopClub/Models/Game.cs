@@ -2,6 +2,10 @@
 {
     public class Game
     {
+        public Game()
+        {
+            Lobby = new Lobby();
+        }
         public int Id { get; set; }
         public string Name { get; set; } = string.Empty;
         public byte[] PasswordHash { get; set; } = new byte[0];
@@ -15,6 +19,6 @@
         public List<Card> Board { get; set; } = new List<Card>();
         public int MaxPlayers { get; set; } = 10;
         public int ActivePlayers { get; set; }
-        public Lobby Lobby { get; set; } = new Lobby();
+        public Lobby Lobby { get; set; }
     }
 }

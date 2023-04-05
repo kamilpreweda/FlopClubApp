@@ -10,8 +10,6 @@ namespace FlopClub.Models
         public byte[] PasswordSalt { get; set; } = new byte[0];
         public int HandsPlayed { get; set; }
         public decimal TotalWinnings { get; set; }
-
-        [NotMapped]
-        public List<int> LobbiesIds { get; set; } = new List<int>();
+        public List<Lobby> Lobbies { get; set; } = new List<Lobby>();
     }
 }

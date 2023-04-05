@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FlopClub.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20230403160656_AddGameNameColumn")]
-    partial class AddGameNameColumn
+    [Migration("20230405100859_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -67,10 +67,16 @@ namespace FlopClub.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<int>("ActivePlayers")
+                        .HasColumnType("int");
+
                     b.Property<decimal>("BigBlindValue")
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("Dealer")
+                        .HasColumnType("int");
+
+                    b.Property<int>("MaxPlayers")
                         .HasColumnType("int");
 
                     b.Property<string>("Name")
@@ -96,6 +102,16 @@ namespace FlopClub.Migrations
                     b.ToTable("Games");
                 });
 
+            modelBuilder.Entity("FlopClub.Models.Lobby", b =>
+                {
+                    b.Property<int>("Id")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Lobbies");
+                });
+
             modelBuilder.Entity("FlopClub.Models.Player", b =>
                 {
                     b.Property<int>("Id")
@@ -119,14 +135,12 @@ namespace FlopClub.Migrations
                     b.Property<int>("TimeToAct")
                         .HasColumnType("int");
 
-                    b.Property<int?>("UserId")
+                    b.Property<int>("UserId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
                     b.HasIndex("GameId");
-
-                    b.HasIndex("UserId");
 
                     b.ToTable("Players");
                 });
@@ -162,6 +176,21 @@ namespace FlopClub.Migrations
                     b.ToTable("Users");
                 });
 
+            modelBuilder.Entity("LobbyUser", b =>
+                {
+                    b.Property<int>("LobbiesId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UsersId")
+                        .HasColumnType("int");
+
+                    b.HasKey("LobbiesId", "UsersId");
+
+                    b.HasIndex("UsersId");
+
+                    b.ToTable("LobbyUser");
+                });
+
             modelBuilder.Entity("FlopClub.Models.Card", b =>
                 {
                     b.HasOne("FlopClub.Models.Game", null)
@@ -177,17 +206,37 @@ namespace FlopClub.Migrations
                         .HasForeignKey("PlayerId");
                 });
 
+            modelBuilder.Entity("FlopClub.Models.Lobby", b =>
+                {
+                    b.HasOne("FlopClub.Models.Game", "Game")
+                        .WithOne("Lobby")
+                        .HasForeignKey("FlopClub.Models.Lobby", "Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Game");
+                });
+
             modelBuilder.Entity("FlopClub.Models.Player", b =>
                 {
                     b.HasOne("FlopClub.Models.Game", null)
                         .WithMany("Players")
                         .HasForeignKey("GameId");
+                });
 
-                    b.HasOne("FlopClub.Models.User", "User")
+            modelBuilder.Entity("LobbyUser", b =>
+                {
+                    b.HasOne("FlopClub.Models.Lobby", null)
                         .WithMany()
-                        .HasForeignKey("UserId");
+                        .HasForeignKey("LobbiesId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-                    b.Navigation("User");
+                    b.HasOne("FlopClub.Models.User", null)
+                        .WithMany()
+                        .HasForeignKey("UsersId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("FlopClub.Models.Game", b =>
@@ -195,6 +244,9 @@ namespace FlopClub.Migrations
                     b.Navigation("Board");
 
                     b.Navigation("Deck");
+
+                    b.Navigation("Lobby")
+                        .IsRequired();
 
                     b.Navigation("Players");
                 });

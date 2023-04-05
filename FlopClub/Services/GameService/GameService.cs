@@ -126,7 +126,7 @@ namespace FlopClub.Services.GameService
             //};
 
             gameToJoin.Lobby.Users.Add(user);
-            user.LobbiesIds.Add(gameToJoin.Lobby.Id);
+            user.Lobbies.Add(gameToJoin.Lobby);
 
             await _context.SaveChangesAsync();
 
@@ -157,9 +157,9 @@ namespace FlopClub.Services.GameService
 
             foreach(var user in gameToDelete.Lobby.Users)
             {
-                if(user.LobbiesIds.Contains(gameToDelete.Lobby.Id))
+                if(user.Lobbies.Contains(gameToDelete.Lobby))
                 {
-                    user.LobbiesIds.Remove(gameToDelete.Lobby.Id);
+                    user.Lobbies.Remove(gameToDelete.Lobby);
                 }
             }
 
