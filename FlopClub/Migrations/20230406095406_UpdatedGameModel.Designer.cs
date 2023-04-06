@@ -4,6 +4,7 @@ using FlopClub.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FlopClub.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20230406095406_UpdatedGameModel")]
+    partial class UpdatedGameModel
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -157,40 +160,6 @@ namespace FlopClub.Migrations
                     b.ToTable("Players");
                 });
 
-            modelBuilder.Entity("FlopClub.Models.Role", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Roles");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Name = "GameAdmin"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            Name = "GamePlayer"
-                        },
-                        new
-                        {
-                            Id = 3,
-                            Name = "GameUser"
-                        });
-                });
-
             modelBuilder.Entity("FlopClub.Models.User", b =>
                 {
                     b.Property<int>("Id")
@@ -220,21 +189,6 @@ namespace FlopClub.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Users");
-                });
-
-            modelBuilder.Entity("FlopClub.Models.UserRole", b =>
-                {
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("RoleId")
-                        .HasColumnType("int");
-
-                    b.HasKey("UserId", "RoleId");
-
-                    b.HasIndex("RoleId");
-
-                    b.ToTable("UserRoles");
                 });
 
             modelBuilder.Entity("LobbyUser", b =>
@@ -285,25 +239,6 @@ namespace FlopClub.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("FlopClub.Models.UserRole", b =>
-                {
-                    b.HasOne("FlopClub.Models.Role", "Role")
-                        .WithMany("UserRoles")
-                        .HasForeignKey("RoleId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("FlopClub.Models.User", "User")
-                        .WithMany("UserRoles")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Role");
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("LobbyUser", b =>
                 {
                     b.HasOne("FlopClub.Models.Lobby", null)
@@ -334,16 +269,6 @@ namespace FlopClub.Migrations
             modelBuilder.Entity("FlopClub.Models.Player", b =>
                 {
                     b.Navigation("Cards");
-                });
-
-            modelBuilder.Entity("FlopClub.Models.Role", b =>
-                {
-                    b.Navigation("UserRoles");
-                });
-
-            modelBuilder.Entity("FlopClub.Models.User", b =>
-                {
-                    b.Navigation("UserRoles");
                 });
 #pragma warning restore 612, 618
         }

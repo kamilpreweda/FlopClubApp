@@ -19,6 +19,7 @@
         public List<Card> Board { get; set; } = new List<Card>();
         public int MaxPlayers { get; set; } = 10;
         public int ActivePlayers { get; set; }
+        public bool IsRunning { get; set; } = false;
 
         public Lobby Lobby { get; set; }
         public int GameId { get; set; }

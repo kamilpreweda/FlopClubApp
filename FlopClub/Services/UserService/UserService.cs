@@ -35,6 +35,7 @@ namespace FlopClub.Services.UserService
             var response = new ServiceResponse<GetUserDto>();
             var user = await _context.Users
                 .Include(u => u.Lobbies)
+                .Include(u => u.UserRoles!).ThenInclude(ur => ur.Role)
                 .FirstOrDefaultAsync(u => u.Id == id);
             response.Data = _mapper.Map<GetUserDto>(user);
             return response;
@@ -45,8 +46,9 @@ namespace FlopClub.Services.UserService
             var response = new ServiceResponse<List<GetUserDto>>();
             var users = await _context.Users
                 .Include(u => u.Lobbies)
+                .Include(u => u.UserRoles!).ThenInclude(ur => ur.Role)
                 .ToListAsync();
-            response.Data = users.Select(u => _mapper.Map<GetUserDto>(u)).ToList();
+            response.Data = users.Select(u =>_mapper.Map<GetUserDto>(u)).ToList();
             return response;
         }
     }

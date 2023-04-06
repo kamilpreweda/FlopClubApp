@@ -1,4 +1,5 @@
-﻿using Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.ValueContentAnalysis;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.ValueContentAnalysis;
 using Microsoft.EntityFrameworkCore;
 
 namespace FlopClub.Services.GameService
@@ -40,7 +41,7 @@ namespace FlopClub.Services.GameService
         public async Task<ServiceResponse<GetGameDto>> CreateGame(CreateGameDto newGame)
         {
             var response = new ServiceResponse<GetGameDto>();
-            if(await GameExists(newGame.Name))
+            if (await GameExists(newGame.Name))
             {
                 response.Success = false;
                 response.Message = "Game already exists";
@@ -48,10 +49,29 @@ namespace FlopClub.Services.GameService
             }
 
             _encrypter.CreatePasswordHash(newGame.Password, out byte[] passwordHash, out byte[] passwordSalt);
-   
+
             var game = _mapper.Map<Game>(newGame);
             game.PasswordHash = passwordHash;
             game.PasswordSalt = passwordSalt;
+
+            var user = GetCurrentUser();            
+
+            var adminRole = await _context.Roles.SingleOrDefaultAsync(r => r.Name == "GameAdmin");
+            var lobbyRole = await _context.Roles.SingleOrDefaultAsync(r => r.Name == "GameUser");
+            if (adminRole == null || lobbyRole == null) 
+            {
+                response.Success = false;
+                response.Message = "Role not found";
+                return response;
+            }
+
+            var userAdminRole = new UserRole { User = user, Role = adminRole };
+            var userLobbyRole = new UserRole { User = user, Role = lobbyRole };
+            user.UserRoles.Add(userAdminRole);
+            user.UserRoles.Add(userLobbyRole);
+
+            game.Lobby.Users.Add(user);
+            user.Lobbies.Add(game.Lobby);
 
             _context.Games.Add(game);
             await _context.SaveChangesAsync();
@@ -92,14 +112,6 @@ namespace FlopClub.Services.GameService
                 return response;
             }
 
-            //  LATER CHECK THIS CONDITION
-            //if (CanJoin(game))
-            //{
-            //    response.Success = false;
-            //    response.Message = "Game is full";
-            //    return response;
-            //}
-
             var user = GetCurrentUser();
             if (user == null)
             {
@@ -107,13 +119,6 @@ namespace FlopClub.Services.GameService
                 response.Message = "User not found";
                 return response;
             }
-            // ADD IN BUY IN / JOIN THE TABLE
-            //if (game.Players.Any(p => p.User!.Id == user.Id))
-            //{
-            //    response.Success = false;
-            //    response.Message = "User already joined the game";
-            //    return response;
-            //}
 
             if(gameToJoin.Lobby.Users.Any(u => u.Username == user.Username))
             {
@@ -121,12 +126,6 @@ namespace FlopClub.Services.GameService
                 response.Message = "User is already in the lobby";
                 return response;
             }
-
-            // ADD IN BUY IN / JOIN THE TABLE
-            //var player = new Player
-            //{
-            //    User = user
-            //};
 
             gameToJoin.Lobby.Users.Add(user);
 
@@ -144,6 +143,7 @@ namespace FlopClub.Services.GameService
             var response = new ServiceResponse<GetGameDto>();
             var gameToDelete = await _context.Games
                 .Include(g => g.Players)
+                .Include(g => g.Lobby).ThenInclude(l => l.Users).ThenInclude(u => u.UserRoles)
                 .FirstOrDefaultAsync(g => g.Name == game.Name);
 
             if(gameToDelete == null) {
@@ -164,8 +164,9 @@ namespace FlopClub.Services.GameService
                 if (user.Lobbies.Contains(gameToDelete.Lobby))
                 {
                     user.Lobbies.Remove(gameToDelete.Lobby);
+                    user.UserRoles.Clear();
                 }
-            }
+            }                      
 
             _context.RemoveRange(gameToDelete.Players);
 
@@ -218,6 +219,13 @@ namespace FlopClub.Services.GameService
             {
                 response.Success = false;
                 response.Message = "Game is full.";
+                return response;
+            }
+
+            if (!CanJoin(game))
+            {
+                response.Success = false;
+                response.Message = "Game is full";
                 return response;
             }
 
