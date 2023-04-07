@@ -30,16 +30,7 @@ namespace FlopClub.Services.GameService
                 .FirstOrDefault(u => u.Username == username);     
 
             return user!;
-        }
-
-        private bool CanJoin(Game game)
-        {
-            if (game.ActivePlayers >= game.MaxPlayers)
-            {
-                return false;
-            }
-            return true;
-        }
+        }     
 
         public async Task<ServiceResponse<GetGameDto>> CreateGame(CreateGameDto newGame)
         {
@@ -170,7 +161,7 @@ namespace FlopClub.Services.GameService
                 return response;
             }
 
-            if (user.UserRoles.Any(ur => ur.Role.Name == "GameAdmin"))
+            if (user.UserRoles!.Any(ur => ur.Role.Name == "GameAdmin"))
             {
                 if (lobby.Users.Count == 1)
                 {
@@ -213,7 +204,7 @@ namespace FlopClub.Services.GameService
             var response = new ServiceResponse<GetGameDto>();
             var gameToDelete = await _context.Games
                 .Include(g => g.Players)
-                .Include(g => g.Lobby).ThenInclude(l => l.Users).ThenInclude(u => u.UserRoles)
+                .Include(g => g.Lobby).ThenInclude(l => l.Users).ThenInclude(u => u.UserRoles!).ThenInclude(ur => ur.Role)
                 .FirstOrDefaultAsync(g => g.Name == game.Name);
 
             if(gameToDelete == null) {
@@ -223,7 +214,7 @@ namespace FlopClub.Services.GameService
             }
 
             var currentUser = GetCurrentUser();
-            var isAdmin = currentUser.UserRoles.Any(ur => ur.Role.Name == "GameAdmin");
+            var isAdmin = currentUser.UserRoles!.Any(ur => ur.Role.Name == "GameAdmin");
 
             if (!isAdmin && !_encrypter.VerifyPasswordHash(game.Password, gameToDelete.PasswordHash, gameToDelete.PasswordSalt))
             {
@@ -237,7 +228,7 @@ namespace FlopClub.Services.GameService
                 if (user.Lobbies.Contains(gameToDelete.Lobby))
                 {
                     user.Lobbies.Remove(gameToDelete.Lobby);
-                    user.UserRoles.Clear();
+                    user.UserRoles!.Clear();
                 }
             }                      
 
@@ -268,72 +259,6 @@ namespace FlopClub.Services.GameService
             return response;
         }
 
-        public async Task<ServiceResponse<GetGameDto>> BuyIn(int gameId)
-        {
-            var response = new ServiceResponse<GetGameDto>();
-            var user = GetCurrentUser();
-            var game = await _context.Games.FirstOrDefaultAsync(g => g.Id == gameId);
-
-            if (game == null)
-            {
-                response.Success= false;
-                response.Message = "Game not found";
-                return response;
-            }
-
-            if(game!.Players.Any(p => p.UserId == user.Id))
-            {
-                response.Success = false;
-                response.Message = "User is already a player in the game.";
-                return response;
-            }
-
-            if (!CanJoin(game))
-            {
-                response.Success = false;
-                response.Message = "Game is full";
-                return response;
-            }
-
-            var availablePositions = Enum.GetValues(typeof(PlayerPosition))
-                .Cast<PlayerPosition>()
-                .Where(p => !game.Players.Any(x => x.Position == p))
-                .ToList();
-
-            var player = new Player
-            {
-                UserId = user.Id,
-                GameId = game.Id,
-                Chips = 1000,
-                Position = availablePositions.First()
-            };
-
-            game.Players.Add(player);
-            game.ActivePlayers++;
-            player.BuyInCount++;
-            await _context.SaveChangesAsync();
-
-            response.Success = true;
-            response.Message = "Player was added to the game.";
-            response.Data = _mapper.Map<GetGameDto>(game);
-            return response;
-        }
-
-        public async Task<ServiceResponse<GetGameDto>> LeaveTable(int gameId)
-        {
-            var response = new ServiceResponse<GetGameDto>();
-            var user = GetCurrentUser();
-            var game = await _context.Games.FirstOrDefaultAsync(g => g.Id == gameId);
-            var player = game!.Players.FirstOrDefault(p => p.UserId == user.Id);
-
-            game.Players.Remove(player);
-            game.ActivePlayers--;
-            await _context.SaveChangesAsync();
-
-            response.Success = true;
-            response.Message = "Player was removed from the table";
-            response.Data = _mapper.Map<GetGameDto>(game);
-            return response;
-        }
+        
     }
 }

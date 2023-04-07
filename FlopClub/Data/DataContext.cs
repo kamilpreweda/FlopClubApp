@@ -42,7 +42,6 @@
                 .HasForeignKey(ur => ur.RoleId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-
             modelBuilder.Entity<Role>().HasData(
                 new Role { Id = 1, Name = "GameAdmin" },
                 new Role { Id = 2, Name = "GamePlayer" },
