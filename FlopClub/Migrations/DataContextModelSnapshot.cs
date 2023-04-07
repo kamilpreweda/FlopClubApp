@@ -53,7 +53,7 @@ namespace FlopClub.Migrations
 
                     b.HasIndex("PlayerId");
 
-                    b.ToTable("Cards");
+                    b.ToTable("Cards", (string)null);
                 });
 
             modelBuilder.Entity("FlopClub.Models.Game", b =>
@@ -102,7 +102,7 @@ namespace FlopClub.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Games");
+                    b.ToTable("Games", (string)null);
                 });
 
             modelBuilder.Entity("FlopClub.Models.Lobby", b =>
@@ -121,7 +121,7 @@ namespace FlopClub.Migrations
                     b.HasIndex("GameId")
                         .IsUnique();
 
-                    b.ToTable("Lobbies");
+                    b.ToTable("Lobbies", (string)null);
                 });
 
             modelBuilder.Entity("FlopClub.Models.Player", b =>
@@ -154,7 +154,7 @@ namespace FlopClub.Migrations
 
                     b.HasIndex("GameId");
 
-                    b.ToTable("Players");
+                    b.ToTable("Players", (string)null);
                 });
 
             modelBuilder.Entity("FlopClub.Models.Role", b =>
@@ -171,7 +171,7 @@ namespace FlopClub.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Roles");
+                    b.ToTable("Roles", (string)null);
 
                     b.HasData(
                         new
@@ -219,7 +219,7 @@ namespace FlopClub.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Users");
+                    b.ToTable("Users", (string)null);
                 });
 
             modelBuilder.Entity("FlopClub.Models.UserRole", b =>
@@ -234,7 +234,7 @@ namespace FlopClub.Migrations
 
                     b.HasIndex("RoleId");
 
-                    b.ToTable("UserRoles");
+                    b.ToTable("UserRoles", (string)null);
                 });
 
             modelBuilder.Entity("LobbyUser", b =>
@@ -249,7 +249,7 @@ namespace FlopClub.Migrations
 
                     b.HasIndex("UsersId");
 
-                    b.ToTable("LobbyUser");
+                    b.ToTable("LobbyUser", (string)null);
                 });
 
             modelBuilder.Entity("FlopClub.Models.Card", b =>

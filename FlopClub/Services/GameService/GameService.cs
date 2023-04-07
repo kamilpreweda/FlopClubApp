@@ -288,13 +288,6 @@ namespace FlopClub.Services.GameService
                 return response;
             }
 
-            if(game.ActivePlayers >= game.MaxPlayers)
-            {
-                response.Success = false;
-                response.Message = "Game is full.";
-                return response;
-            }
-
             if (!CanJoin(game))
             {
                 response.Success = false;
@@ -302,11 +295,17 @@ namespace FlopClub.Services.GameService
                 return response;
             }
 
+            var availablePositions = Enum.GetValues(typeof(PlayerPosition))
+                .Cast<PlayerPosition>()
+                .Where(p => !game.Players.Any(x => x.Position == p))
+                .ToList();
+
             var player = new Player
             {
                 UserId = user.Id,
                 GameId = game.Id,
-                Chips = 1000
+                Chips = 1000,
+                Position = availablePositions.First()
             };
 
             game.Players.Add(player);
