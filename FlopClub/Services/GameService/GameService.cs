@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using FlopClub.Services.RoleService;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.ValueContentAnalysis;
 using Microsoft.EntityFrameworkCore;
 
@@ -10,13 +11,15 @@ namespace FlopClub.Services.GameService
         private readonly IEncrypter _encrypter;
         private readonly IMapper _mapper;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IRoleService _roleService;
 
-        public GameService(DataContext context, IEncrypter encrypter, IMapper mapper, IHttpContextAccessor httpContextAccessor)
+        public GameService(DataContext context, IEncrypter encrypter, IMapper mapper, IHttpContextAccessor httpContextAccessor, IRoleService roleService)
         {
             _context = context;
             _encrypter = encrypter;
             _mapper = mapper;
             _httpContextAccessor = httpContextAccessor;
+            _roleService = roleService;
         }
 
         private User GetCurrentUser()
@@ -54,10 +57,11 @@ namespace FlopClub.Services.GameService
             game.PasswordHash = passwordHash;
             game.PasswordSalt = passwordSalt;
 
-            var user = GetCurrentUser();            
+            var user = GetCurrentUser();
 
-            var adminRole = await _context.Roles.SingleOrDefaultAsync(r => r.Name == "GameAdmin");
-            var lobbyRole = await _context.Roles.SingleOrDefaultAsync(r => r.Name == "GameUser");
+            var adminRole = await _roleService.GetRoleByName("GameAdmin");
+            var lobbyRole = await _roleService.GetRoleByName("GameUser");
+
             if (adminRole == null || lobbyRole == null) 
             {
                 response.Success = false;
@@ -65,10 +69,8 @@ namespace FlopClub.Services.GameService
                 return response;
             }
 
-            var userAdminRole = new UserRole { User = user, Role = adminRole };
-            var userLobbyRole = new UserRole { User = user, Role = lobbyRole };
-            user.UserRoles.Add(userAdminRole);
-            user.UserRoles.Add(userLobbyRole);
+            await _roleService.AssignRoleToUser(user.Id, adminRole.Id);
+            await _roleService.AssignRoleToUser(user.Id, lobbyRole.Id);
 
             game.Lobby.Users.Add(user);
             user.Lobbies.Add(game.Lobby);
@@ -126,6 +128,9 @@ namespace FlopClub.Services.GameService
                 response.Message = "User is already in the lobby";
                 return response;
             }
+
+            var lobbyRole = await _roleService.GetRoleByName("GameUser");
+            await _roleService.AssignRoleToUser(user.Id, lobbyRole.Id);
 
             gameToJoin.Lobby.Users.Add(user);
 
