@@ -143,6 +143,71 @@ namespace FlopClub.Services.GameService
             return response;
         }
 
+        public async Task<ServiceResponse<string>> LeaveGameLobby(int gameId)
+        {
+            var response = new ServiceResponse<string>();
+            var user = GetCurrentUser();
+            var game = await _context.Games
+                .Include(g => g.Lobby)
+                .ThenInclude(l => l.Users).ThenInclude(u => u.UserRoles)
+                .SingleOrDefaultAsync(g => g.Id == gameId);
+
+            if (game == null)
+            {
+                response.Success = false;
+                response.Message = "Game not found";
+                return response;
+            }
+
+            var lobby = game.Lobby;
+            var lobbyRole = await _roleService.GetRoleByName("GameUser");
+            var adminRole = await _roleService.GetRoleByName("GameAdmin");
+
+            if (lobbyRole == null || adminRole == null)
+            {
+                response.Success = false;
+                response.Message = "Role not found";
+                return response;
+            }
+
+            if (user.UserRoles.Any(ur => ur.Role.Name == "GameAdmin"))
+            {
+                if (lobby.Users.Count == 1)
+                {
+                    // Delete game if user is the only one left in the lobby
+                    await DeleteGame(_mapper.Map<DeleteGameDto>(game));
+                    response.Data = "Game deleted";
+                    return response;
+                }
+                else
+                {
+                    // Randomly assign the GameAdmin role to another user in the lobby
+                    var nextAdmin = lobby.Users.Except(new[] { user })
+                        .OrderBy(x => Guid.NewGuid())
+                        .FirstOrDefault();
+
+                    if (nextAdmin == null)
+                    {
+                        response.Success = false;
+                        response.Message = "Failed to assign GameAdmin role";
+                        return response;
+                    }
+
+                    await _roleService.RemoveRoleFromUser(user.Id, adminRole.Id);
+                    await _roleService.AssignRoleToUser(nextAdmin.Id, adminRole.Id);
+                }
+            }
+
+            lobby.Users.Remove(user);
+            user.Lobbies.Remove(lobby);
+
+            await _roleService.RemoveRoleFromUser(user.Id, lobbyRole.Id);
+            await _context.SaveChangesAsync();
+
+            response.Data = "User successfully removed from game lobby";
+            return response;
+        }
+
         public async Task<ServiceResponse<GetGameDto>> DeleteGame(DeleteGameDto game)
         {
             var response = new ServiceResponse<GetGameDto>();
@@ -157,7 +222,10 @@ namespace FlopClub.Services.GameService
                 return response;
             }
 
-            if (!_encrypter.VerifyPasswordHash(game.Password, gameToDelete.PasswordHash, gameToDelete.PasswordSalt))
+            var currentUser = GetCurrentUser();
+            var isAdmin = currentUser.UserRoles.Any(ur => ur.Role.Name == "GameAdmin");
+
+            if (!isAdmin && !_encrypter.VerifyPasswordHash(game.Password, gameToDelete.PasswordHash, gameToDelete.PasswordSalt))
             {
                 response.Success = false;
                 response.Message = "Incorrect password";

@@ -29,6 +29,18 @@ namespace FlopClub.Controllers
         }
 
         [Authorize]
+        [HttpDelete("{gameId}/leave")]
+        public async Task<IActionResult> LeaveGameLobby(int gameId)
+        {
+            var response = await _gameService.LeaveGameLobby(gameId);
+            if (!response.Success)
+            {
+                return BadRequest(response);
+            }
+            return Ok(response);
+        }
+
+        [Authorize]
         [HttpDelete]
         public async Task<ActionResult> DeleteGame(DeleteGameDto game)
         {

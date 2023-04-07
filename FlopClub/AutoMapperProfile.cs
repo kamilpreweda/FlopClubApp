@@ -11,6 +11,9 @@ namespace FlopClub
             CreateMap<CreateGameDto, Game>();
             CreateMap<Game, GetGameDto>();
 
+            CreateMap<DeleteGameDto, Game>();
+            CreateMap<Game, DeleteGameDto>();
+
             CreateMap<User, GetUserDto>()
                 .ForMember(dest => dest.LobbyIds, opt => opt.MapFrom(src => src.Lobbies.Select(l => l.Id)))
                 .ForMember(dto => dto.Roles, opt => opt.MapFrom(src => src.UserRoles!.Select(ur => ur.Role).ToList()));
