@@ -310,6 +310,7 @@ namespace FlopClub.Services.GameService
 
             game.Players.Add(player);
             game.ActivePlayers++;
+            player.BuyInCount++;
             await _context.SaveChangesAsync();
 
             response.Success = true;

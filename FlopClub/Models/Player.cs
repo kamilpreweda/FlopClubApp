@@ -11,5 +11,6 @@ namespace FlopClub.Models
         public HandStrength Hand { get; set; }
         public PlayerPosition Position { get; set; }
         public int TimeToAct { get; set; }
+        public int BuyInCount { get; set; }
     }
 }
