@@ -27,7 +27,7 @@ namespace FlopClub.Services.GameService
             var username = _httpContextAccessor.HttpContext!.User!.Identity!.Name;
             var user = _context.Users
                 .Include(u => u.Lobbies)
-                .FirstOrDefault(u => u.Username == username);     
+                .SingleOrDefault(u => u.Username == username);     
 
             return user!;
         }     
@@ -89,7 +89,7 @@ namespace FlopClub.Services.GameService
             var gameToJoin = await _context.Games
                 .Include(g => g.Lobby)
                 .ThenInclude(l => l.Users)
-                .FirstOrDefaultAsync(g => g.Name == game.Name);
+                .SingleOrDefaultAsync(g => g.Name == game.Name);
 
             if (gameToJoin == null)
             {
@@ -205,7 +205,7 @@ namespace FlopClub.Services.GameService
             var gameToDelete = await _context.Games
                 .Include(g => g.Players)
                 .Include(g => g.Lobby).ThenInclude(l => l.Users).ThenInclude(u => u.UserRoles!).ThenInclude(ur => ur.Role)
-                .FirstOrDefaultAsync(g => g.Name == game.Name);
+                .SingleOrDefaultAsync(g => g.Name == game.Name);
 
             if(gameToDelete == null) {
                 response.Success = false;

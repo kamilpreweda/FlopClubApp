@@ -8,6 +8,7 @@
         public int MaxPlayers { get; set; } = 10;
         public int ActivePlayers { get; set; } = 0;
         public int LobbyId { get; set; }
+        public bool IsRunning { get; set; }
 
     }
 }

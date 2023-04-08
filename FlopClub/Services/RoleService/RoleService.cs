@@ -68,8 +68,8 @@
         {
             var response = new ServiceResponse<GetUserDto>();
 
-            var user = await _context.Users.Include(u => u.UserRoles).FirstOrDefaultAsync(u => u.Id == userId);
-            var role = await _context.Roles.FirstOrDefaultAsync(r => r.Id == roleId);
+            var user = await _context.Users.Include(u => u.UserRoles).SingleOrDefaultAsync(u => u.Id == userId);
+            var role = await _context.Roles.SingleOrDefaultAsync(r => r.Id == roleId);
 
             if (user == null || role == null)
             {
@@ -96,8 +96,8 @@
         {
             var response = new ServiceResponse<GetUserDto>();
 
-            var user = await _context.Users.Include(u => u.UserRoles).FirstOrDefaultAsync(u => u.Id == userId);
-            var role = await _context.Roles.FirstOrDefaultAsync(r => r.Id == roleId);
+            var user = await _context.Users.Include(u => u.UserRoles).SingleOrDefaultAsync(u => u.Id == userId);
+            var role = await _context.Roles.SingleOrDefaultAsync(r => r.Id == roleId);
 
             if (user == null || role == null)
             {
@@ -106,7 +106,7 @@
                 return response;
             }
 
-            var userRole = user.UserRoles.FirstOrDefault(ur => ur.RoleId == roleId);
+            var userRole = user.UserRoles.SingleOrDefault(ur => ur.RoleId == roleId);
             if (userRole == null)
             {
                 response.Success = false;

@@ -34,5 +34,19 @@ namespace FlopClub.Controllers
         {
             return Ok(await _tableService.SetPositions(gameId));
         }
+
+        [Authorize]
+        [HttpPut("{gameId}/start")]
+        public async Task<ActionResult<ServiceResponse<GetGameDto>>> StartGame(int gameId)
+        {
+            return Ok(await _tableService.StartGame(gameId));
+        }
+
+        [Authorize]
+        [HttpPut("{gameId}/pause")]
+        public async Task<ActionResult<ServiceResponse<GetGameDto>>> PauseGame(int gameId)
+        {
+            return Ok(await _tableService.PauseGame(gameId));
+        }
     }
 }

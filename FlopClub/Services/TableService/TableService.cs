@@ -22,7 +22,7 @@
             var user = _context.Users
                 .Include(u => u.Lobbies)
                 .Include(u => u.UserRoles!).ThenInclude(ur => ur.Role)
-                .FirstOrDefault(u => u.Username == username);
+                .SingleOrDefault(u => u.Username == username);
 
             return user!;
         }
@@ -42,7 +42,7 @@
             var game = await _context.Games
                 .Include(g => g.Players)
                 .Include(g => g.Lobby).ThenInclude(l => l.Users)
-                .FirstOrDefaultAsync(g => g.Id == gameId);
+                .SingleOrDefaultAsync(g => g.Id == gameId);
 
             if (game == null)
             {
@@ -100,7 +100,7 @@
         {
             var response = new ServiceResponse<GetGameDto>();
             var user = GetCurrentUser();
-            var game = await _context.Games.FirstOrDefaultAsync(g => g.Id == gameId);
+            var game = await _context.Games.SingleOrDefaultAsync(g => g.Id == gameId);
             var player = game!.Players.FirstOrDefault(p => p.UserId == user.Id);
 
             game.Players.Remove(player!);
@@ -119,7 +119,7 @@
             var user = GetCurrentUser();
             var game = await _context.Games
                 .Include(g => g.Players)
-                .FirstOrDefaultAsync(g => g.Id == gameId);
+                .SingleOrDefaultAsync(g => g.Id == gameId);
 
             if (game == null)
             {
@@ -171,6 +171,64 @@
                 player.Cards.Clear();
             }
 
+            await _context.SaveChangesAsync();
+
+            response.Data = _mapper.Map<GetGameDto>(game);
+            return response;
+        }
+
+        public async Task<ServiceResponse<GetGameDto>> StartGame(int gameId)
+        {
+            var response = new ServiceResponse<GetGameDto>();
+            var user = GetCurrentUser();
+            var game = await _context.Games.FindAsync(gameId);
+
+            if (game == null)
+            {
+                response.Success = false;
+                response.Message = "Game not found";
+                return response;
+            }
+
+            var isAdmin = user.UserRoles.Any(ur => ur.Role.Name == "GameAdmin");
+
+            if (!isAdmin)
+            {
+                response.Success = false;
+                response.Message = "User is not an admin of the game";
+                return response;
+            }
+
+            game.IsRunning = true;
+            await _context.SaveChangesAsync();
+
+            response.Data = _mapper.Map<GetGameDto>(game);
+            return response;
+        }
+
+        public async Task<ServiceResponse<GetGameDto>> PauseGame(int gameId)
+        {
+            var response = new ServiceResponse<GetGameDto>();
+            var user = GetCurrentUser();
+            var game = await _context.Games.FindAsync(gameId);
+
+            if (game == null)
+            {
+                response.Success = false;
+                response.Message = "Game not found";
+                return response;
+            }
+
+            var isAdmin = user.UserRoles.Any(ur => ur.Role.Name == "GameAdmin");
+
+            if (!isAdmin)
+            {
+                response.Success = false;
+                response.Message = "User is not an admin of the game";
+                return response;
+            }
+
+            game.IsRunning = false;
             await _context.SaveChangesAsync();
 
             response.Data = _mapper.Map<GetGameDto>(game);
