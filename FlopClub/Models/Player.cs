@@ -12,5 +12,6 @@ namespace FlopClub.Models
         public PlayerPosition Position { get; set; }
         public int TimeToAct { get; set; }
         public int BuyInCount { get; set; }
+        public bool isDealer { get; set; } = false;
     }
 }

@@ -32,5 +32,17 @@ namespace FlopClub.Services.DeckService
                 deck[j] = temp;
             }
         }
+
+        public void DealCards(Game game)
+        {
+            for (int i = 0; i < 2; i++)
+            {
+                foreach (var player in game.Players)
+                {
+                    player.Cards.Add(game.Deck.First());
+                    game.Deck.Remove(game.Deck.First());
+                }
+            }
+        }
     }
 }

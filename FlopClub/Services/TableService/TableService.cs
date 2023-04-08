@@ -35,6 +35,40 @@
             return true;
         }
 
+        private void PostBlinds(Game game)
+        {
+            var bbPlayer = game.Players.Single(p => p.Position == PlayerPosition.BB);
+            var sbPlayer = game.Players.Single(p => p.Position == PlayerPosition.SB);
+
+            bbPlayer.Chips -= game.BigBlindValue;
+            game.Pot += game.BigBlindValue;
+
+            sbPlayer.Chips -= game.SmallBlindValue;
+            game.Pot += game.SmallBlindValue;
+        }
+
+        private void SetDealer(List<Player> orderedPlayers)
+        {
+            int dealerIndex = orderedPlayers.Count - 1;
+            orderedPlayers[dealerIndex].isDealer = true;
+        }
+
+        private void StartRound(Game game)
+        {
+            while (game.IsRunning)
+            {
+                PostBlinds(game);
+                SetDealer(game.Players);
+                if(game.Deck == null)
+                {
+                    _deckService.PopulateDeck(game);
+                }
+                _deckService.ShuffleDeck(game.Deck!);
+                _deckService.DealCards(game);
+
+            }
+        }
+
         public async Task<ServiceResponse<GetGameDto>> BuyIn(int gameId)
         {
             var response = new ServiceResponse<GetGameDto>();
@@ -196,6 +230,13 @@
             {
                 response.Success = false;
                 response.Message = "User is not an admin of the game";
+                return response;
+            }
+
+            if (game.Players.Count < 2)
+            {
+                response.Success = false;
+                response.Message = "At least 2 player are required for the game.";
                 return response;
             }
 
