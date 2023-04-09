@@ -16,6 +16,8 @@ global using FlopClub.Services.UserService;
 global using FlopClub.Services.RoleService;
 global using FlopClub.Services.DeckService;
 global using FlopClub.Services.HandEvaluator;
+global using FlopClub.Services.GameLogicService;
+global using FlopClub.Services.PlayerService;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -56,6 +58,8 @@ builder.Services.AddScoped<ITableService, TableService>();
 builder.Services.AddScoped<IRoleService, RoleService>();
 builder.Services.AddScoped<IDeckService, DeckService>();
 builder.Services.AddScoped<IHandEvaluator, HandEvaluator>();
+builder.Services.AddScoped<IGameLogicService, GameLogicService>();
+builder.Services.AddScoped<IPlayerService, PlayerService>();
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {

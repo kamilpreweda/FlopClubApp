@@ -20,6 +20,8 @@
         public int MaxPlayers { get; set; } = 10;
         public int ActivePlayers { get; set; }
         public bool IsRunning { get; set; } = false;
+        public RoundStage RoundStage { get; set; }
+        public decimal CurrentBet { get; set; }
 
         public Lobby Lobby { get; set; }
         public int GameId { get; set; }

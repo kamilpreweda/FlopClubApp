@@ -7,14 +7,16 @@
         private readonly IMapper _mapper;
         private readonly IDeckService _deckService;
         private readonly IHandEvaluator _handEvaluator;
+        private readonly IGameLogicService _gameLogicService;
 
-        public TableService(DataContext context, IHttpContextAccessor httpContextAccessor, IMapper mapper, IDeckService deckService, IHandEvaluator handEvaluator)
+        public TableService(DataContext context, IHttpContextAccessor httpContextAccessor, IMapper mapper, IDeckService deckService, IHandEvaluator handEvaluator, IGameLogicService gameLogicService)
         {
             _context = context;
             _httpContextAccessor = httpContextAccessor;
             _mapper = mapper;
             _deckService = deckService;
             _handEvaluator = handEvaluator;
+            _gameLogicService = gameLogicService;
         }
         private User GetCurrentUser()
         {
@@ -41,33 +43,57 @@
             var sbPlayer = game.Players.Single(p => p.Position == PlayerPosition.SB);
 
             bbPlayer.Chips -= game.BigBlindValue;
+            bbPlayer.CurrentBet = game.BigBlindValue;
+            game.CurrentBet = game.BigBlindValue;
             game.Pot += game.BigBlindValue;
 
             sbPlayer.Chips -= game.SmallBlindValue;
+            sbPlayer.CurrentBet = game.BigBlindValue;
             game.Pot += game.SmallBlindValue;
+
+            foreach(var player in game.Players)
+            {
+                _gameLogicService.SetAmmountToCall(game.CurrentBet - player.CurrentBet, player);
+            }
         }
 
         private void SetDealer(List<Player> orderedPlayers)
         {
             int dealerIndex = orderedPlayers.Count - 1;
-            orderedPlayers[dealerIndex].isDealer = true;
+            orderedPlayers[dealerIndex].IsDealer = true;
         }
 
         private void StartRound(Game game)
         {
             while (game.IsRunning)
             {
+                game.RoundStage = RoundStage.Preflop;
+
                 PostBlinds(game);
                 SetDealer(game.Players);
-                if(game.Deck == null)
+
+                if (game.Deck == null)
                 {
                     _deckService.PopulateDeck(game);
                 }
                 _deckService.ShuffleDeck(game.Deck!);
                 _deckService.DealCards(game);
 
+                _gameLogicService.SetFirstPlayerMove(game);
+
+                var currentPlayer = game.Players.SingleOrDefault(p => p.HasMove == true);
+                var possibleActions = _gameLogicService.DefinePossibleActions(game, currentPlayer!);
+
+                while (currentPlayer!.HasMove)
+                {
+                    if (possibleActions.Contains(currentPlayer.PlayerAction)) 
+                    { 
+                        _gameLogicService.HandleAction(game, currentPlayer, currentPlayer.PlayerAction);
+                    }
+                }
             }
         }
+
 
         public async Task<ServiceResponse<GetGameDto>> BuyIn(int gameId)
         {

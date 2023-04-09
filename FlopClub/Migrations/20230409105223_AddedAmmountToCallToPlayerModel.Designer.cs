@@ -4,6 +4,7 @@ using FlopClub.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FlopClub.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20230409105223_AddedAmmountToCallToPlayerModel")]
+    partial class AddedAmmountToCallToPlayerModel
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -147,9 +150,6 @@ namespace FlopClub.Migrations
                     b.Property<decimal>("Chips")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<decimal>("CurrentBet")
-                        .HasColumnType("decimal(18,2)");
-
                     b.Property<int>("GameId")
                         .HasColumnType("int");
 
@@ -173,9 +173,6 @@ namespace FlopClub.Migrations
 
                     b.Property<bool>("IsDealer")
                         .HasColumnType("bit");
-
-                    b.Property<int>("PlayerAction")
-                        .HasColumnType("int");
 
                     b.Property<int>("Position")
                         .HasColumnType("int");

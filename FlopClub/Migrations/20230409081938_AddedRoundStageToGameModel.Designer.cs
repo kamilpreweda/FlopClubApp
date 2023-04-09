@@ -4,6 +4,7 @@ using FlopClub.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FlopClub.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20230409081938_AddedRoundStageToGameModel")]
+    partial class AddedRoundStageToGameModel
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -68,9 +71,6 @@ namespace FlopClub.Migrations
                         .HasColumnType("int");
 
                     b.Property<decimal>("BigBlindValue")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<decimal>("CurrentBet")
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("Dealer")
@@ -138,43 +138,16 @@ namespace FlopClub.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<decimal>("AmmountToCall")
-                        .HasColumnType("decimal(18,2)");
-
                     b.Property<int>("BuyInCount")
                         .HasColumnType("int");
 
                     b.Property<decimal>("Chips")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<decimal>("CurrentBet")
-                        .HasColumnType("decimal(18,2)");
-
                     b.Property<int>("GameId")
                         .HasColumnType("int");
 
                     b.Property<int>("Hand")
-                        .HasColumnType("int");
-
-                    b.Property<bool>("HasCalled")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("HasChecked")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("HasFolded")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("HasMove")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("HasRaised")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsDealer")
-                        .HasColumnType("bit");
-
-                    b.Property<int>("PlayerAction")
                         .HasColumnType("int");
 
                     b.Property<int>("Position")
@@ -185,6 +158,9 @@ namespace FlopClub.Migrations
 
                     b.Property<int>("UserId")
                         .HasColumnType("int");
+
+                    b.Property<bool>("isDealer")
+                        .HasColumnType("bit");
 
                     b.HasKey("Id");
 

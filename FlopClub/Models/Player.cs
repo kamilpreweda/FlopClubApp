@@ -12,6 +12,15 @@ namespace FlopClub.Models
         public PlayerPosition Position { get; set; }
         public int TimeToAct { get; set; }
         public int BuyInCount { get; set; }
-        public bool isDealer { get; set; } = false;
+        public bool IsDealer { get; set; } = false;
+        public bool HasMove { get; set; } = false;
+        public bool HasFolded { get; set; } = false;
+        public bool HasChecked { get; set; } = false;
+        public bool HasCalled { get; set; } = false;
+        public bool HasRaised { get; set; } = false;
+        public decimal AmmountToCall { get; set; }
+        public decimal CurrentBet { get; set; }
+        public PlayerAction PlayerAction { get; set; }
+        public decimal RaisedTo { get; set; }
     }
 }
