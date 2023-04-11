@@ -95,27 +95,21 @@ namespace FlopClub.Services.GameLogicService
 
                 case PlayerAction.Call: 
                     {
-                        player.Chips -= player.AmmountToCall;
-                        player.CurrentBet = player.AmmountToCall;
                         game.Pot += player.AmmountToCall;
-
-                        _playerService.Call(player);
+                        _playerService.Call(player, player.AmmountToCall);
                     }
                     break;
 
                 case PlayerAction.Raise: 
-                    {
-                        player.RaisedTo = raiseAmmount;
-                        player.Chips -= raiseAmmount;
-                        player.CurrentBet = raiseAmmount;
+                    {                   
                         game.Pot += raiseAmmount;
                         game.CurrentBet = raiseAmmount;
-                        _playerService.Raise(player);
+                        _playerService.Raise(player, raiseAmmount);
                     }
                     break;
             }
 
-            player.HasMove = false;
+            _playerService.EndMove(player);
         }
     }
 }

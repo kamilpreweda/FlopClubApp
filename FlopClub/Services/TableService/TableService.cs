@@ -8,8 +8,9 @@
         private readonly IDeckService _deckService;
         private readonly IHandEvaluator _handEvaluator;
         private readonly IGameLogicService _gameLogicService;
+        private readonly IPlayerService _playerService;
 
-        public TableService(DataContext context, IHttpContextAccessor httpContextAccessor, IMapper mapper, IDeckService deckService, IHandEvaluator handEvaluator, IGameLogicService gameLogicService)
+        public TableService(DataContext context, IHttpContextAccessor httpContextAccessor, IMapper mapper, IDeckService deckService, IHandEvaluator handEvaluator, IGameLogicService gameLogicService, IPlayerService playerService)
         {
             _context = context;
             _httpContextAccessor = httpContextAccessor;
@@ -17,6 +18,7 @@
             _deckService = deckService;
             _handEvaluator = handEvaluator;
             _gameLogicService = gameLogicService;
+            _playerService = playerService;
         }
         private User GetCurrentUser()
         {
@@ -86,13 +88,30 @@
 
                 while (currentPlayer!.HasMove)
                 {
-                    if (possibleActions.Contains(currentPlayer.PlayerAction)) 
-                    { 
+                    if (possibleActions.Contains(currentPlayer.PlayerAction))
+                    {
                         _gameLogicService.HandleAction(game, currentPlayer, currentPlayer.PlayerAction);
+
+                        var nonFoldedPlayers = game.Players.Where(p => !p.HasFolded).ToList();
+                        if (nonFoldedPlayers.Count == 1)
+                        {
+                            EndRound(nonFoldedPlayers.First(), game);
+                        }
                     }
                 }
             }
         }
+
+        private void EndRound(Player winner, Game game)
+        {
+            winner.Chips += game.Pot;
+            game.Pot = 0;
+            foreach (var player in game.Players) 
+            {
+                _playerService.ClearValues(player);
+            }
+        }
+
 
 
         public async Task<ServiceResponse<GetGameDto>> BuyIn(int gameId)

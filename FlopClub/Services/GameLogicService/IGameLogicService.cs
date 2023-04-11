@@ -8,6 +8,6 @@
 
         void SetAmmountToCall(decimal amountToCall, Player player);
 
-        void HandleAction(Game game, Player player, PlayerAction action);
+        void HandleAction(Game game, Player player, PlayerAction action, decimal ammount = 0);
     }
 }
